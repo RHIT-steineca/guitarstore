@@ -5,6 +5,8 @@ public class main {
     static HashMap<String, String> employees;
     static Inventory inventory;
     static Boolean isLoggedIn;
+    static Scanner input;
+
     public static void main(String[] args) {
         employees = new HashMap<String, String>();
         inventory = new Inventory();
@@ -12,8 +14,8 @@ public class main {
         
         loadDatabase();
 
+        input = new Scanner(System.in);
         while(true) {
-            Scanner input = new Scanner(System.in);
             String cmdoptions = "Search For Guitar (S)";
             if(isLoggedIn) {
                 cmdoptions += " / Add Guitar (A) / Remove Guitar (R) / Update Price (P) / Update Location (L) / Employee Logout (Q)";
@@ -25,7 +27,6 @@ public class main {
                                 cmdoptions);
             String command = input.nextLine();
             parseCommand(command);
-            input.close();
         }
     }
 
@@ -37,6 +38,7 @@ public class main {
 
     public static void parseCommand(String command) {
         if(command.equals("S")) {
+            handleSearch();
             return;
         }
         if(isLoggedIn) {
@@ -57,6 +59,7 @@ public class main {
                 return;
             } else if(command.equals("L")) {
                 handleUpdateLocation();
+                return;
             }
         } else {
             if(command.equals("E")) {
@@ -77,6 +80,10 @@ public class main {
         return;
     }
 
+    public static void handleSearch() {
+        return;
+    }
+
     public static void handleLogin() {
         isLoggedIn = true;
         return;
@@ -84,47 +91,50 @@ public class main {
 
     public static void handleAddGuitar() {
         Scanner input = new Scanner(System.in);
-        System.out.println("\nPlease enter:");
+        System.out.println("\nPlease enter the guitar's serial number:");
         String serialnum = input.nextLine();
+        System.out.println("\nPlease enter the guitar's price:");
         String price = input.nextLine();
+        System.out.println("\nPlease enter the guitar's builder:");
         String builder = input.nextLine();
+        System.out.println("\nPlease enter the guitar's model:");
         String model = input.nextLine();
+        System.out.println("\nPlease enter the guitar's type:");
         String type = input.nextLine();
+        System.out.println("\nPlease enter the guitar's topwood:");
         String topwood = input.nextLine();
+        System.out.println("\nPlease enter the guitar's location:");
         String location = input.nextLine();
         inventory.addGuitar(serialnum, price, builder, model, type, topwood, location);
-        input.close();
+        System.out.println("\nGuitar added!");
         return;
     }
 
     public static void handleRemoveGuitar() {
-        Scanner input = new Scanner(System.in);
         System.out.println("\nPlease enter the serial number of the guitar you wish to remove:");
         String serialnum = input.nextLine();
         inventory.removeGuitar(serialnum);
-        input.close();
+        System.out.println("\nGuitar removed!");
         return;
     }
 
     public static void handleUpdatePrice() {
-        Scanner input = new Scanner(System.in);
         System.out.println("\nPlease enter the serial number of the guitar you wish to update the price of:");
         String serialnum = input.nextLine();
         System.out.println("\nPlease enter the new price of the guitar:");
         String price = input.nextLine();
         inventory.updatePrice(serialnum, price);
-        input.close();
+        System.out.println("\nGuitar price updated!");
         return;
     }
 
     public static void handleUpdateLocation() {
-        Scanner input = new Scanner(System.in);
         System.out.println("\nPlease enter the serial number of the guitar you wish to update the location of:");
         String serialnum = input.nextLine();
         System.out.println("\nPlease enter the new location of the guitar:");
         String location = input.nextLine();
         inventory.updateLocation(serialnum, location);
-        input.close();
+        System.out.println("\nGuitar location updated!");
         return;
     }
 }
