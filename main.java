@@ -52,6 +52,9 @@ public class main {
             csvscanner = new Scanner(invFile);
             while (csvscanner.hasNextLine()) {
                 String[] split = csvscanner.nextLine().split(",");
+                if(split[0].isEmpty()) {
+                    continue;
+                }
                 inventory.addGuitar(new Guitar(split[0], split[1], split[2], split[3], split[4], split[5], split[6]));
             }
             csvscanner.close();
