@@ -1,5 +1,10 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -7,7 +12,6 @@ public class main {
     static HashMap<String, String> employees;
     static Inventory inventory;
     static Boolean isLoggedIn;
-    static File invFile;
     static Scanner input;
 
     public static void main(String[] args) {
@@ -43,11 +47,12 @@ public class main {
                 String[] split = csvscanner.nextLine().split(",");
                 employees.put(split[0], split[1]);
             }
-            invFile = new File("inventory.csv");
+            csvscanner.close();
+            File invFile = new File("inventory.csv");
             csvscanner = new Scanner(invFile);
             while (csvscanner.hasNextLine()) {
                 String[] split = csvscanner.nextLine().split(",");
-                inventory.addGuitar(split[0], split[1], split[2], split[3], split[4], split[5], split[6]);
+                inventory.addGuitar(new Guitar(split[0], split[1], split[2], split[3], split[4], split[5], split[6]));
             }
             csvscanner.close();
             return 1;
@@ -106,12 +111,23 @@ public class main {
     }
 
     public static void handleLogin() {
-        isLoggedIn = true;
+        System.out.println("\nPlease enter your username:");
+        String user = input.nextLine();
+        System.out.println("\nPlease enter your password:");
+        String pass = input.nextLine();
+        if(employees.containsKey(user)) {
+            if(employees.get(user).equals(pass)) {
+                isLoggedIn = true;
+            } else {
+                System.out.println("\nInvalid password.");
+            }
+        } else {
+            System.out.println("\nInvalid user.");
+        }
         return;
     }
 
     public static void handleAddGuitar() {
-        Scanner input = new Scanner(System.in);
         System.out.println("\nPlease enter the guitar's serial number:");
         String serialnum = input.nextLine();
         System.out.println("\nPlease enter the guitar's price:");
@@ -126,7 +142,15 @@ public class main {
         String topwood = input.nextLine();
         System.out.println("\nPlease enter the guitar's location:");
         String location = input.nextLine();
-        inventory.addGuitar(serialnum, price, builder, model, type, topwood, location);
+        inventory.addGuitar(new Guitar(serialnum, price, builder, model, type, topwood, location));
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter("inventory.csv", true));
+            writer.append("\n" + serialnum + "," + price + "," + builder + "," + model + "," + type + "," + topwood + "," + location);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("\nGuitar added!");
         return;
     }
@@ -135,6 +159,29 @@ public class main {
         System.out.println("\nPlease enter the serial number of the guitar you wish to remove:");
         String serialnum = input.nextLine();
         inventory.removeGuitar(serialnum);
+
+        File invFile = new File("inventory.csv");
+        File temp = new File("temp.csv");
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(invFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+            String lineToRemove = serialnum;
+            String currentLine;
+    
+            while((currentLine = reader.readLine()) != null) {
+                String trimmedLine = currentLine.trim();
+                if(trimmedLine.split(",")[0].equals(lineToRemove)) continue;
+                writer.write(currentLine + System.getProperty("line.separator"));
+            }
+            writer.close();
+            reader.close();
+            invFile.delete();
+            File newinvFile = new File("inventory.csv");
+            temp.renameTo(newinvFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("\nGuitar removed!");
         return;
     }
@@ -145,6 +192,33 @@ public class main {
         System.out.println("\nPlease enter the new price of the guitar:");
         String price = input.nextLine();
         inventory.updatePrice(serialnum, price);
+
+        File invFile = new File("inventory.csv");
+        File temp = new File("temp.csv");
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(invFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+            String lineToUpdate = serialnum;
+            String currentLine;
+    
+            while((currentLine = reader.readLine()) != null) {
+                String trimmedLine = currentLine.trim();
+                String[] split = trimmedLine.split(",");
+                if(split[0].equals(lineToUpdate)) {
+                    writer.write(split[0] + "," + price + "," + split[2] + "," + split[3] + "," + split[4] + "," + split[5] + "," + split[6] + System.getProperty("line.separator"));
+                    continue;
+                }
+                writer.write(currentLine + System.getProperty("line.separator"));
+            }
+            writer.close();
+            reader.close();
+            invFile.delete();
+            File newinvFile = new File("inventory.csv");
+            temp.renameTo(newinvFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("\nGuitar price updated!");
         return;
     }
@@ -155,6 +229,33 @@ public class main {
         System.out.println("\nPlease enter the new location of the guitar:");
         String location = input.nextLine();
         inventory.updateLocation(serialnum, location);
+
+        File invFile = new File("inventory.csv");
+        File temp = new File("temp.csv");
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(invFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+            String lineToUpdate = serialnum;
+            String currentLine;
+    
+            while((currentLine = reader.readLine()) != null) {
+                String trimmedLine = currentLine.trim();
+                String[] split = trimmedLine.split(",");
+                if(split[0].equals(lineToUpdate)) {
+                    writer.write(split[0] + "," + split[1] + "," + split[2] + "," + split[3] + "," + split[4] + "," + split[5] + "," + location + System.getProperty("line.separator"));
+                    continue;
+                }
+                writer.write(currentLine + System.getProperty("line.separator"));
+            }
+            writer.close();
+            reader.close();
+            invFile.delete();
+            File newinvFile = new File("inventory.csv");
+            temp.renameTo(newinvFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("\nGuitar location updated!");
         return;
     }
