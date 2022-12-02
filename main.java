@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -5,6 +7,7 @@ public class main {
     static HashMap<String, String> employees;
     static Inventory inventory;
     static Boolean isLoggedIn;
+    static File invFile;
     static Scanner input;
 
     public static void main(String[] args) {
@@ -12,7 +15,9 @@ public class main {
         inventory = new Inventory();
         isLoggedIn = false;
         
-        loadDatabase();
+        if(loadDatabase() == 0) {
+            return;
+        }
 
         input = new Scanner(System.in);
         while(true) {
@@ -30,10 +35,26 @@ public class main {
         }
     }
 
-    public static void loadDatabase() {
-        // load employee list
-        // load inventory
-        return;
+    public static int loadDatabase() {
+        try {
+            File empFile = new File("employees.csv");
+            Scanner csvscanner = new Scanner(empFile);
+            while (csvscanner.hasNextLine()) {
+                String[] split = csvscanner.nextLine().split(",");
+                employees.put(split[0], split[1]);
+            }
+            invFile = new File("inventory.csv");
+            csvscanner = new Scanner(invFile);
+            while (csvscanner.hasNextLine()) {
+                String[] split = csvscanner.nextLine().split(",");
+                inventory.addGuitar(split[0], split[1], split[2], split[3], split[4], split[5], split[6]);
+            }
+            csvscanner.close();
+            return 1;
+        } catch (FileNotFoundException e) {
+            System.out.print("\nDatabase files not found!");
+            return 0;
+        }
     }
 
     public static void parseCommand(String command) {
